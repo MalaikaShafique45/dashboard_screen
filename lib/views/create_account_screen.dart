@@ -9,6 +9,7 @@ class CreateAccountScreen extends StatefulWidget {
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool _isObscure = true;
+  // ignore: unused_field
   String? _farmType;
   final List<String> _types = ['Crop Farming', 'Mixed Farming', 'Horticulture'];
 

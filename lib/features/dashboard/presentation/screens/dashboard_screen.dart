@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'ai_chat_screen.dart';
-import 'iot_sensors_screen.dart';
-import 'govt_scheme_screen.dart';
-import 'market_rates_screen.dart';
+import '../../../../views/ai_chat_screen.dart';
+import '../../../../views/iot_sensors_screen.dart';
+import '../../../../views/govt_scheme_screen.dart';
+import '../../../../views/market_rates_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
