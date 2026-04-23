@@ -1,5 +1,5 @@
-git add .import 'package:flutter/material.dart';
-import 'views/splash_screen.dart'; // Ye line sabse zaroori hai!
+import 'package:flutter/material.dart';
+import 'views/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());

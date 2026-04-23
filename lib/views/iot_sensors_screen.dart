@@ -6,9 +6,9 @@ class IotSensorsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Slightly grey for better contrast
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text("IoT Sensors Dashboard",
+        title: const Text("Smart Farm (IoT)",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF1B4332),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -20,11 +20,11 @@ class IotSensorsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Real-time Monitoring",
+              "Smart Farm (IoT)", // Updated Name
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const Text(
-                "آئی او ٹی سینسرز ڈیش بورڈ",
+                "سمارٹ فارم (آئی او ٹی)", // Updated Urdu Name
                 style: TextStyle(color: Colors.grey, fontSize: 16)
             ),
             const SizedBox(height: 20),
@@ -79,7 +79,7 @@ class IotSensorsScreen extends StatelessWidget {
     );
   }
 
-  // Sensor Card Helper - FIXED WARNINGS
+  // Sensor Card Helper
   Widget _sensorChartCard({
     required String title,
     required String urduTitle,
@@ -128,7 +128,6 @@ class IotSensorsScreen extends StatelessWidget {
               Text(extraValue, style: const TextStyle(color: Colors.blueGrey, fontSize: 14)),
             const SizedBox(height: 15),
 
-            // Fixed .withOpacity warning using .withValues
             Container(
               height: 80,
               width: double.infinity,

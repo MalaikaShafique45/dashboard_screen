@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+
+// Screens in the same folder
+import 'crops_history.dart';
+import 'farm_profile_screen.dart';
+import 'expert_help.dart';
+import 'settings_screen.dart';
+import '../../../../views/sign_in_screen.dart';
+
+// Screens in the views folder
 import '../../../../views/ai_chat_screen.dart';
 import '../../../../views/iot_sensors_screen.dart';
 import '../../../../views/govt_scheme_screen.dart';
@@ -9,65 +18,49 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryGreen = Color(0xFF1B4332);
+    const Color primaryGreen = Color(0xFF1B4332);
+    const Color bgCream = Color(0xFFF9F3E5);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: bgCream,
       appBar: AppBar(
-        title: const Text("Kisan Sahulat",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text("Farm with AI", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: primaryGreen,
-        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        // Actions wala block yahan se khatam kar diya gaya hai
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF1B4332), // primaryGreen color
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            // Drawer Header
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF2D6A4F)),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.eco, color: Colors.white, size: 40),
-                    SizedBox(height: 10),
-                    Text(
-                      "Kisan Sahulat",
-                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+        backgroundColor: bgCream,
+        child: Column(
+          children: <Widget>[
+            const UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: primaryGreen),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, color: primaryGreen, size: 40),
               ),
+              accountName: Text("Malaika Shafique",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              accountEmail: Text("ID: 1230100670 | Verified Farmer"),
             ),
-
-            // 1. Home
-            _sidebarItem(context, Icons.home, "Home", "ہوم", () => Navigator.pop(context)),
-
-            // 2. AI Chat
-            _sidebarItem(context, Icons.chat, "AI Chat", "اے آئی چیٹ", () {
-              Navigator.pop(context); // Drawer band karne ke liye
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AiChatScreen()));
+            _sidebarItem(context, Icons.history, "Crops History", "فصلوں کا ریکارڈ", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CropsHistoryScreen()));
             }),
-
-            // 3. IoT Sensors
-            _sidebarItem(context, Icons.sensors, "IoT Sensors", "سینسرز", () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const IotSensorsScreen()));
+            _sidebarItem(context, Icons.agriculture, "Farm Profile", "فارم پروفائل", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const FarmProfileScreen()));
             }),
-
-            // 4. Govt Schemes
-            _sidebarItem(context, Icons.account_balance, "Govt Schemes", "سرکاری اسکیمیں", () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const GovtSchemeScreen()));
+            _sidebarItem(context, Icons.contact_support_outlined, "Expert Help", "ماہرین کی مدد", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ExpertHelpScreen()));
             }),
-
-            // 5. Market Rates
-            _sidebarItem(context, Icons.trending_up, "Market Rates", "منڈی ریٹ", () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const MarketRatesScreen()));
+            _sidebarItem(context, Icons.settings, "Settings", "ترتیبات", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+            }),
+            const Divider(),
+            // Sidebar mein Logout Button
+            _sidebarItem(context, Icons.exit_to_app, "Logout", "لاگ آؤٹ", () {
+              _showLogoutDialog(context);
             }),
           ],
         ),
@@ -75,136 +68,126 @@ class DashboardScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: <Widget>[
             _buildBanner(),
-
-            // Yahan se 'const' hata diya gaya hai taake warning na aaye
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(16.0),
               child: GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                children: [
-                  _buildMenuCard(context, "AI Chatbot", Icons.chat_bubble_outline, const AiChatScreen(), "اے آئی چیٹ بوٹ"),
-                  _buildMenuCard(context, "IoT Sensors", Icons.sensors, const IotSensorsScreen(), "آئی او ٹی سینسرز"),
-                  _buildMenuCard(context, "Govt Schemes", Icons.account_balance, const GovtSchemeScreen(), "سرکاری اسکیمیں"),
-                  _buildMenuCard(context, "Market Rates", Icons.trending_up, const MarketRatesScreen(), "منڈی ریٹ"),
+                children: <Widget>[
+                  _buildMenuCard(context, "Agri Dost AI", Icons.smart_toy, const AiChatScreen(), "ایگری دوست (چیٹ)", Colors.orange),
+                  _buildMenuCard(context, "Mandi Rates", Icons.trending_up, const MarketRatesScreen(), "منڈی ریٹ (تازہ ترین)", Colors.green),
+                  _buildMenuCard(context, "Kisan Rahnumai", Icons.account_balance, const GovtSchemeScreen(), "کسان رہنمائی (اسکیمیں)", Colors.brown),
+                  _buildMenuCard(context, "Smart Farm (IoT)", Icons.sensors, const IotSensorsScreen(), "سمارٹ فارم (سینسرز)", Colors.teal),
                 ],
               ),
             ),
-
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
               child: Row(
-                children: [
-                  Text("Quick Overview ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                children: <Widget>[
+                  Text("Quick Overview ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1B4332))),
                   Text("(فوری جائزہ)", style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ],
               ),
             ),
-
             _buildOverviewSection(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF52B788), Color(0xFF1B4332)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Farmer Chat", style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-          SizedBox(height: 5),
-          Text("AI-powered support for crops\n(فصلوں کے لیے اے آئی مدد)",
-              style: TextStyle(color: Colors.white70, fontSize: 14)),
+  // --- Logout Dialog Function ---
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Logout", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to logout?\nکیا آپ لاگ آؤٹ کرنا چاہتے ہیں؟"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel (کینسل)", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Dialog band karein
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const SignInScreen()),
+                    (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Yes (جی ہاں)", style: TextStyle(color: Colors.white)),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuCard(BuildContext context, String title, IconData icon, Widget screen, String urduSub) {
+  // --- Helper Widgets ---
+  Widget _buildBanner() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFF2D6A4F), Color(0xFF1B4332)]),
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Assalam-o-Alaikum,", style: TextStyle(color: Colors.white70, fontSize: 16)),
+          Text("Malaika Shafique", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          Text("Kheti bari ke sawalat ke liye Agri Dost se rabta karein.", style: TextStyle(color: Colors.white70, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuCard(BuildContext context, String title, IconData icon, Widget screen, String urdu, Color col) {
     return InkWell(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => screen)),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              // withOpacity ki jagah withValues use kiya gaya hai
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4))
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              backgroundColor: const Color(0xFFD8F3DC),
-              radius: 25,
-              child: Icon(icon, color: const Color(0xFF1B4332), size: 28),
-            ),
-            const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            const SizedBox(height: 4),
-            Text(urduSub, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+            Icon(icon, color: col, size: 35),
+            const SizedBox(height: 10),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1B4332))),
+            Text(urdu, style: const TextStyle(color: Colors.grey, fontSize: 10)),
           ],
         ),
       ),
     );
   }
 
-  Widget _sidebarItem(BuildContext context, IconData icon, String title, String urdu, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.white),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(urdu, style: const TextStyle(color: Colors.white60, fontSize: 11)),
-      onTap: onTap,
-    );
-  }
-
   Widget _buildOverviewSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: [
-              _overviewBox("Moisture", "65%", "نمی", Icons.water_drop, Colors.blue),
-              const SizedBox(width: 8),
-              _overviewBox("Temp", "32°C", "درجہ حرارت", Icons.thermostat, Colors.orange),
-              const SizedBox(width: 8),
-              _overviewBox("Weather", "Sunny", "موسم", Icons.wb_sunny, Colors.amber),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _overviewBox("Active Crops", "4", "فعال فصلیں", Icons.eco, Colors.green),
-              const SizedBox(width: 8),
-              _overviewBox("Market Update", "↑ 5%", "منڈی اپڈیٹ", Icons.trending_up, Colors.teal),
-              const SizedBox(width: 8),
-              const Expanded(child: SizedBox()),
-            ],
-          ),
+          _overviewBox("Moisture", "65%", "نمی", Icons.water_drop, Colors.blue),
+          const SizedBox(width: 10),
+          _overviewBox("Temp", "32°C", "درجہ حرارت", Icons.thermostat, Colors.orange),
+          const SizedBox(width: 10),
+          _overviewBox("Weather", "Sunny", "موسم", Icons.wb_sunny, Colors.amber),
         ],
       ),
     );
@@ -217,7 +200,7 @@ class DashboardScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          border: Border.all(color: Colors.grey.withOpacity(0.1)),
         ),
         child: Column(
           children: [
@@ -230,6 +213,15 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _sidebarItem(BuildContext context, IconData icon, String title, String urduText, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF1B4332)),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text(urduText),
+      onTap: onTap,
     );
   }
 }

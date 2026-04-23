@@ -84,7 +84,7 @@ class _GovtSchemeScreenState extends State<GovtSchemeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text("Government Schemes", style: TextStyle(color: Colors.white)),
+        title: const Text("Kisan Rahnumai", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF1B4332),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

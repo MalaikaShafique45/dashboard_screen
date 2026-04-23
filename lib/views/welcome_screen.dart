@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'create_account_screen.dart';
+import 'sign_in_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -102,10 +102,11 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   onPressed: () {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CreateAccountScreen()),
+                        context,
+                        MaterialPageRoute(builder: (context) => const CreateAccountScreen())
                     );
                   },
+
                   child: const Text("Create Account", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 15),
@@ -118,7 +119,7 @@ class WelcomeScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SignInScreen()));
                   },
                   child: const Text("I Already Have an Account", style: TextStyle(color: Color(0xFF2D6A4F), fontWeight: FontWeight.bold)),
                 ),

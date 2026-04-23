@@ -8,89 +8,176 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
+  // Screen colors matching your theme
+  final Color primaryGreen = const Color(0xFF7BA76F); // Green shade from your screenshot
+  final Color bgCream = const Color(0xFFF9F3E5);
   bool _isObscure = true;
-  // ignore: unused_field
   String? _farmType;
   final List<String> _types = ['Crop Farming', 'Mixed Farming', 'Horticulture'];
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF76A76F);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F3E5),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            Align(alignment: Alignment.centerLeft, child: BackButton(color: Colors.black)),
-            Image.asset('assets/logo.png', height: 60),
-            const Text("Create Account", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-            const Text("Join our community of farmers", style: TextStyle(color: Colors.grey)),
-            const SizedBox(height: 25),
+      backgroundColor: bgCream,
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: Column(
+            children: [
+              const SizedBox(height: 50),
 
-            _input(Icons.person_outline, "Full Name"),
-            _input(Icons.email_outlined, "Email Address"),
-            _input(Icons.phone_outlined, "Phone Number"),
-            _dropdown(Icons.location_on_outlined, "Location/Village", []),
-            _dropdown(Icons.eco_outlined, "Farm Type", _types),
-
-            // Password Field
-            TextField(
-              obscureText: _isObscure,
-              decoration: _deco(Icons.lock_outline, "Password").copyWith(
-                suffixIcon: IconButton(
-                  icon: Icon(_isObscure ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _isObscure = !_isObscure),
+              // Back Button and Logo as per your screenshot
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  color: Colors.black,
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                onPressed: () {},
-                child: const Text("Create My Account", style: TextStyle(color: Colors.white, fontSize: 18)),
+              Image.asset(
+                'assets/images/logo.png.png',
+                height: 150,
+                errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.agriculture, size: 50, color: Color(0xFF1B4332)),
               ),
-            ),
 
-            TextButton(
-              onPressed: () {},
-              child: const Text.rich(TextSpan(text: "Already have an account? ", style: TextStyle(color: Colors.black), children: [
-                TextSpan(text: "Sign In", style: TextStyle(color: primary, fontWeight: FontWeight.bold))
-              ])),
-            ),
-          ],
+              const SizedBox(height: 10),
+              const Text(
+                "Create Account",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const Text(
+                "Join our community of farmers",
+                style: TextStyle(color: Colors.black54, fontSize: 14),
+              ),
+
+              const SizedBox(height: 25),
+
+              _buildInputField(Icons.person_outline, "Full Name"),
+              const SizedBox(height: 15),
+              _buildInputField(Icons.email_outlined, "Email Address"),
+              const SizedBox(height: 15),
+              _buildInputField(Icons.phone_outlined, "Phone Number"),
+              const SizedBox(height: 15),
+              _buildInputField(Icons.location_on_outlined, "Location/Village"),
+              const SizedBox(height: 15),
+
+              // Dropdown for Farm Type
+              _buildDropdownField(Icons.agriculture_outlined, "Farm Type"),
+              const SizedBox(height: 15),
+
+              // Password Field with Eye Icon
+              _buildPasswordField(),
+
+              const SizedBox(height: 30),
+
+              // Create Account Button
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryGreen,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    "Create My Account",
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // Login Redirect
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Already have an account? "),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Text(
+                      "Sign In",
+                      style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30), // Bottom padding for keyboard
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Reusable Decoration
-  InputDecoration _deco(IconData icon, String hint) => InputDecoration(
-    prefixIcon: Icon(icon, color: const Color(0xFF76A76F)),
-    hintText: hint,
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-    contentPadding: const EdgeInsets.symmetric(vertical: 15),
-  );
+  // Helper for normal input fields
+  Widget _buildInputField(IconData icon, String hint) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: hint,
+          prefixIcon: Icon(icon, color: primaryGreen),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 15),
+        ),
+      ),
+    );
+  }
 
-  Widget _input(IconData icon, String hint) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(decoration: _deco(icon, hint)),
-  );
+  // Helper for password field
+  Widget _buildPasswordField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextField(
+        obscureText: _isObscure,
+        decoration: InputDecoration(
+          hintText: "Password",
+          prefixIcon: Icon(Icons.lock_outline, color: primaryGreen),
+          suffixIcon: IconButton(
+            icon: Icon(_isObscure ? Icons.visibility_off : Icons.visibility),
+            onPressed: () => setState(() => _isObscure = !_isObscure),
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 15),
+        ),
+      ),
+    );
+  }
 
-  Widget _dropdown(IconData icon, String hint, List<String> items) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: DropdownButtonFormField<String>(
-      decoration: _deco(icon, hint),
-      items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-      onChanged: (v) => setState(() => _farmType = v),
-    ),
-  );
+  // Helper for dropdown
+  Widget _buildDropdownField(IconData icon, String hint) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _farmType,
+          hint: Text(hint),
+          isExpanded: true,
+          icon: Icon(Icons.arrow_drop_down, color: primaryGreen),
+          items: _types.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (newValue) => setState(() => _farmType = newValue),
+        ),
+      ),
+    );
+  }
 }

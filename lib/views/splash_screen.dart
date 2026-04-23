@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 30),
               // Text without any box background
               const Text(
-                "Welcome to our\nFarmer Chat",
+                "Welcome to our\nFarm with AI",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,

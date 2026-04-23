@@ -17,7 +17,7 @@ class _MarketRatesScreenState extends State<MarketRatesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Market Rates", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Mandi Rates", style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF1B4332),
         foregroundColor: Colors.white,
       ),
