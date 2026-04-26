@@ -40,7 +40,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
         children: [
           Expanded(
             child: Center(
-              child: Text(t['welcome']!, style: const TextStyle(fontSize: 16, color: Colors.grey)),
+              child: Text(t['Welcome']!, style: const TextStyle(fontSize: 16, color: Colors.grey)),
             ),
           ),
 

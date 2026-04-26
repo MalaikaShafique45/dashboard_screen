@@ -45,7 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/images/fields.bg.jpg'), // <--- Check path
+                      image: AssetImage('assets/images/fields.bg.jpg'),
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.only(
@@ -106,10 +106,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     const Text("Sign In", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 25),
 
-                    // Email Field
                     _buildTextField("Email Address", "ای میل (Email)", _emailController, Icons.email_outlined),
                     const SizedBox(height: 20),
-                    // Password Field
                     _buildTextField("Password", "پاس ورڈ (Password)", _passwordController, Icons.lock_outline, isPassword: true),
 
                     const SizedBox(height: 35),
@@ -120,7 +118,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       height: 55,
                       child: ElevatedButton(
                         onPressed: () {
-                          // FIX: Navigation logic is simplified and functional
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => DashboardScreen())
@@ -162,7 +159,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // --- Helper Widget for Input Fields ---
   Widget _buildTextField(String label, String urduLabel, TextEditingController controller, IconData icon, {bool isPassword = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

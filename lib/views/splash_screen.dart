@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'welcome_screen.dart';
-
+import '../../utility/app_constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,7 +14,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // 8 Seconds Timer as requested
     Timer(const Duration(seconds: 6), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -28,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B4332), // Dark Green Background
+      backgroundColor: AppConstants.primaryGreen,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -36,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               // Logo Animation
               TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.0, end: 1.0),
+                tween: Tween<double>(begin: 0.0, end: 2.0),
                 duration: const Duration(seconds: 3),
                 curve: Curves.easeOutBack,
                 builder: (context, value, child) {
@@ -49,14 +48,14 @@ class _SplashScreenState extends State<SplashScreen> {
                   );
                 },
                 child: Image.asset(
-                  'assets/images/logo.png.png',
-                  width: 290, // Bara logo size
+                  'assets/images/logo.png.png', // Ek baar .png check kar lein
+                  width: 290,
                   height: 290,
                   fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 30),
-              // Text without any box background
+              // Text
               const Text(
                 "Welcome to our\nFarm with AI",
                 textAlign: TextAlign.center,
@@ -68,9 +67,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              // Optional: Smooth loading indicator
               const SizedBox(
-                width: 50,
+                width: 45,
                 child: LinearProgressIndicator(
                   backgroundColor: Colors.transparent,
                   color: Colors.white70,

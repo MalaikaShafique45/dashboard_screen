@@ -13,8 +13,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> body = jsonDecode(response.body);
-
-        // Yahan mapping check karein
         return body.map((item) => MarketRateModel.fromJson(item)).toList();
       } else {
         throw Exception('Server error: ${response.statusCode}');

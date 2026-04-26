@@ -13,7 +13,7 @@ class WelcomeScreen extends StatelessWidget {
         children: [
           // --- TOP SECTION (Image Background) ---
           Expanded(
-            flex: 6,
+            flex: 7,
             child: Stack(
               children: [
                 Container(
@@ -36,8 +36,8 @@ class WelcomeScreen extends StatelessWidget {
                         const Row(
                           children: [
                             Icon(Icons.eco, color: Colors.white, size: 28),
-                            SizedBox(width: 8), // Remove redundant const
-                            Text("FarmerChat", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                            SizedBox(width: 8),
+                            Text("Farm with AI", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const Spacer(),
@@ -82,7 +82,6 @@ class WelcomeScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      // Added 'const' to clean up blue lines
                        TagWidget(Icons.trending_up, "Market Prices"),
                        SizedBox(width: 10),
                        TagWidget(Icons.group, "Community"),
@@ -132,7 +131,6 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-// Pehle '_tag' tha, ab 'TagWidget' (Capital 'T' aur 'W')
 class TagWidget extends StatelessWidget {
   final IconData icon;
   final String text;

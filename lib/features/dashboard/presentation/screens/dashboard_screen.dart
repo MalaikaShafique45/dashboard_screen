@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'crops_history.dart';
 import 'farm_profile_screen.dart';
 import 'expert_help.dart';
+import 'admin_dashboard_screen.dart';
 import 'settings_screen.dart';
 import '../../../../views/sign_in_screen.dart';
 
@@ -53,6 +54,9 @@ class DashboardScreen extends StatelessWidget {
             }),
             _sidebarItem(context, Icons.contact_support_outlined, "Expert Help", "ماہرین کی مدد", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const ExpertHelpScreen()));
+            }),
+            _sidebarItem(context, Icons.admin_panel_settings_outlined, "Admin Panel", "ایڈمن پینل", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen()));
             }),
             _sidebarItem(context, Icons.settings, "Settings", "ترتیبات", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
