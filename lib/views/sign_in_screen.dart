@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dashboard_screen/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:dashboard_screen/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'services/auth_service.dart';
+
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -14,6 +15,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   String _selectedRole = "User";
+  final AuthService _authService = AuthService(); // Service instance
 
   static const Color primaryGreen = Color(0xFF1B4332);
 
@@ -22,6 +24,44 @@ class _SignInScreenState extends State<SignInScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // --- LOGIN LOGIC FUNCTION ---
+  Future<void> _handleLogin() async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email aur Password lazmi likhein!")),
+      );
+      return;
+    }
+
+    // API Call through AuthService
+    bool success = await _authService.login(email, password);
+
+    if (success) {
+      if (!mounted) return;
+      
+      // Role-based Navigation
+      if (_selectedRole == "Admin") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        );
+      }
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login fail ho gaya! Email ya Password check karein.")),
+      );
+    }
   }
 
   @override
@@ -64,8 +104,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   top: screenHeight * 0.12,
                   left: 0,
                   right: 0,
-                  child: Column(
-                    children: const [
+                  child: const Column(
+                    children: [
                       Icon(Icons.eco, size: 60, color: Colors.white),
                       SizedBox(height: 10),
                       Text("Farmer's Portal", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
@@ -84,14 +124,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   const Text("Sign In", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 25),
 
-                  // Email & Password Fields
                   _buildTextField("Email Address", "ای میل", _emailController, Icons.email_outlined),
                   const SizedBox(height: 20),
                   _buildTextField("Password", "پاس ورڈ", _passwordController, Icons.lock_outline, isPassword: true),
 
                   const SizedBox(height: 30),
 
-                  // --- ROLE SELECTOR (Neeche move kar diya gaya hai) ---
                   const Text("Login As:", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -116,24 +154,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
                   const SizedBox(height: 25),
 
-                  // Login Button
+                  // Fixed Login Button
                   SizedBox(
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (_selectedRole == "Admin") {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-                          );
-                        } else {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const DashboardScreen()),
-                          );
-                        }
-                      },
+                      onPressed: _handleLogin, // Calling the login logic
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryGreen,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -144,40 +170,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
                   const SizedBox(height: 15),
 
-                  // Register Text (Ab iske upar selection hai)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Don't have an account?"),
                       TextButton(
-                         onPressed: () async {
-  
-  String email = _emailController.text.trim();
-  String password = _passwordController.text.trim();
-  if (email.isEmpty || password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Email aur Password lazmi likhein!")),
-    );
-    return;
-  }
-
-  final AuthService auth = AuthService();
-  bool success = await auth.login(email, password);
-
-  if (success) {
-    
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MarketRatesScreen()), // Example
-    );
-  } else {
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login fail ho gaya! Email ya Password check karein.")),
-    );
-  }
-},
- 
+                        onPressed: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAccountScreen()));
                         },
                         child: const Text("Register", style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
