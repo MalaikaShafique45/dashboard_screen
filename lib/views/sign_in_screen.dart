@@ -150,37 +150,34 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       const Text("Don't have an account?"),
                       TextButton(
-                          onPressed: () async {
-
-  String user = emailController.text.trim(); 
-  String pass = passwordController.text.trim();
-
-  if (user.isEmpty || pass.isEmpty) {
+                         onPressed: () async {
+  
+  String email = _emailController.text.trim();
+  String password = _passwordController.text.trim();
+  if (email.isEmpty || password.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Email aur Password likhna zaroori hai!")),
+      const SnackBar(content: Text("Email aur Password lazmi likhein!")),
     );
     return;
   }
 
-
-  AuthService auth = AuthService();
-  bool success = await auth.login(user, pass);
-
+  final AuthService auth = AuthService();
+  bool success = await auth.login(email, password);
 
   if (success) {
-  
-  
+    
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      MaterialPageRoute(builder: (context) => const MarketRatesScreen()), // Example
     );
   } else {
-  
+    
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login Failed! Username ya Password galat hai.")),
+      const SnackBar(content: Text("Login fail ho gaya! Email ya Password check karein.")),
     );
   }
 },
+ 
                           Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAccountScreen()));
                         },
                         child: const Text("Register", style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
