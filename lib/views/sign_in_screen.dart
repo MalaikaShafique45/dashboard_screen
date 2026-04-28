@@ -2,7 +2,7 @@ import 'package:dashboard_screen/views/create_account_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dashboard_screen/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:dashboard_screen/features/admin/presentation/screens/admin_dashboard_screen.dart';
-
+import 'services/auth_service.dart';
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -150,7 +150,37 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       const Text("Don't have an account?"),
                       TextButton(
-                        onPressed: () {
+                          onPressed: () async {
+
+  String user = emailController.text.trim(); 
+  String pass = passwordController.text.trim();
+
+  if (user.isEmpty || pass.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Email aur Password likhna zaroori hai!")),
+    );
+    return;
+  }
+
+
+  AuthService auth = AuthService();
+  bool success = await auth.login(user, pass);
+
+
+  if (success) {
+  
+  
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const DashboardScreen()),
+    );
+  } else {
+  
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Login Failed! Username ya Password galat hai.")),
+    );
+  }
+},
                           Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAccountScreen()));
                         },
                         child: const Text("Register", style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
