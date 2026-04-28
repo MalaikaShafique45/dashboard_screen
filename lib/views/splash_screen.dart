@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   );
                 },
                 child: Image.asset(
-                  'assets/images/logo.png.png', // Ek baar .png check kar lein
+                  'assets/images/logo.png.png',
                   width: 290,
                   height: 290,
                   fit: BoxFit.contain,

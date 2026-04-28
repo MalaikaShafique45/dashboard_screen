@@ -1,10 +1,9 @@
+import 'package:dashboard_screen/features/dashboard/presentation/screens/rquest_help_screen/request_list_screen.dart';
 import 'package:flutter/material.dart';
 
 // Screens in the same folder
-import 'crops_history.dart';
+import 'crops_history.dart'; // Ensure file name is correct
 import 'farm_profile_screen.dart';
-import 'expert_help.dart';
-import 'admin_dashboard_screen.dart';
 import 'settings_screen.dart';
 import '../../../../views/sign_in_screen.dart';
 
@@ -30,7 +29,6 @@ class DashboardScreen extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        // Actions wala block yahan se khatam kar diya gaya hai
       ),
       drawer: Drawer(
         backgroundColor: bgCream,
@@ -46,23 +44,24 @@ class DashboardScreen extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold)),
               accountEmail: Text("ID: 1230100670 | Verified Farmer"),
             ),
+            // --- FIX 1: Name changed to CropsHistory ---
             _sidebarItem(context, Icons.history, "Crops History", "فصلوں کا ریکارڈ", () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const CropsHistoryScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CropsHistory()));
             }),
             _sidebarItem(context, Icons.agriculture, "Farm Profile", "فارم پروفائل", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const FarmProfileScreen()));
             }),
-            _sidebarItem(context, Icons.contact_support_outlined, "Expert Help", "ماہرین کی مدد", () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ExpertHelpScreen()));
-            }),
-            _sidebarItem(context, Icons.admin_panel_settings_outlined, "Admin Panel", "ایڈمن پینل", () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen()));
+            _sidebarItem(context, Icons.person_add_alt_1, "Connection Requests", "رابطہ کی درخواستیں", () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FarmerRequestList())
+              );
             }),
             _sidebarItem(context, Icons.settings, "Settings", "ترتیبات", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
             }),
             const Divider(),
-            // Sidebar mein Logout Button
             _sidebarItem(context, Icons.exit_to_app, "Logout", "لاگ آؤٹ", () {
               _showLogoutDialog(context);
             }),
@@ -85,7 +84,8 @@ class DashboardScreen extends StatelessWidget {
                 children: <Widget>[
                   _buildMenuCard(context, "Agri Dost AI", Icons.smart_toy, const AiChatScreen(), "ایگری دوست (چیٹ)", Colors.orange),
                   _buildMenuCard(context, "Mandi Rates", Icons.trending_up, const MarketRatesScreen(), "منڈی ریٹ (تازہ ترین)", Colors.green),
-                  _buildMenuCard(context, "Kisan Rahnumai", Icons.account_balance, const GovtSchemeScreen(), "کسان رہنمائی (اسکیمیں)", Colors.brown),
+                  // --- Farmer's Grooming updated ---
+                  _buildMenuCard(context, "Farmer's Grooming", Icons.account_balance, const GovtSchemeScreen(), "کسان رہنمائی (تربیت)", Colors.brown),
                   _buildMenuCard(context, "Smart Farm (IoT)", Icons.sensors, const IotSensorsScreen(), "سمارٹ فارم (سینسرز)", Colors.teal),
                 ],
               ),
@@ -107,38 +107,8 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // --- Logout Dialog Function ---
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("Logout", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-        content: const Text("Are you sure you want to logout?\nکیا آپ لاگ آؤٹ کرنا چاہتے ہیں؟"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel (کینسل)", style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Dialog band karein
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const SignInScreen()),
-                    (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text("Yes (جی ہاں)", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
+  // --- Header, Overview, and MenuCard widgets are the same as before ---
 
-  // --- Helper Widgets ---
   Widget _buildBanner() {
     return Container(
       width: double.infinity,
@@ -151,7 +121,7 @@ class DashboardScreen extends StatelessWidget {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Assalam-o-Alaikum,", style: TextStyle(color: Colors.white70, fontSize: 16)),
+          Text("Assalam-o-Alaikum,", style: TextStyle(color: Colors.white70, fontSize: 14)),
           Text("Malaika Shafique", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
           SizedBox(height: 10),
           Text("Kheti bari ke sawalat ke liye Agri Dost se rabta karein.", style: TextStyle(color: Colors.white70, fontSize: 12)),
@@ -174,7 +144,7 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Icon(icon, color: col, size: 35),
             const SizedBox(height: 10),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1B4332))),
+            Text(title, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1B4332))),
             Text(urdu, style: const TextStyle(color: Colors.grey, fontSize: 10)),
           ],
         ),
@@ -226,6 +196,36 @@ class DashboardScreen extends StatelessWidget {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(urduText),
       onTap: onTap,
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Logout", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to logout?\nکیا آپ لاگ آؤٹ کرنا چاہتے ہیں؟"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel (کینسل)", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const SignInScreen()),
+                    (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Yes (جی ہاں)", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }

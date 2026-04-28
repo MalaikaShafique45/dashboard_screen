@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utility/app_constants.dart'; // Aapki constants file ka link
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -11,6 +12,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   String selectedLanguage = 'اردو';
   final TextEditingController _controller = TextEditingController();
 
+
   final Map<String, Map<String, String>> translations = {
     'English': {'welcome': 'Hello! How can I help you?', 'hint': 'Type message...'},
     'اردو': {'welcome': 'السلام علیکم! میں آپ کی کیا مدد کر سکتا ہوں؟', 'hint': 'پیغام لکھیں...'},
@@ -19,16 +21,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Check karein ke key 'welcome' hi ho (small w)
     var t = translations[selectedLanguage]!;
-    const primaryGreen = Color(0xFF1B4332);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F5),
       appBar: AppBar(
-        title: const Text("Agri Dost AI", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: primaryGreen,
-        elevation: 0,
-        // Language Switcher in AppBar
+        title: const Text("Agri Dost AI",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: AppConstants.primaryGreen, // Hex color constants se aa raha hai
+        elevation: 2,
         actions: [
           _buildLanguageButton('English'),
           _buildLanguageButton('سنڌي'),
@@ -38,25 +40,35 @@ class _AiChatScreenState extends State<AiChatScreen> {
       ),
       body: Column(
         children: [
+          // Chat Area
           Expanded(
             child: Center(
-              child: Text(t['Welcome']!, style: const TextStyle(fontSize: 16, color: Colors.grey)),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  t['welcome']!, // Capital 'W' ko small 'w' kar diya
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w500),
+                ),
+              ),
             ),
           ),
 
-          // --- FINAL CLEAN INPUT AREA ---
+          // Input Area
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))
+              ],
+            ),
             child: Row(
               children: [
-                // 1. Camera Button
                 IconButton(
-                  icon: const Icon(Icons.camera_alt_outlined, color: Colors.grey),
-                  onPressed: () {}, // Camera Logic
+                  icon: const Icon(Icons.camera_alt_outlined, color: AppConstants.secondaryGreen),
+                  onPressed: () {},
                 ),
-
-                // 2. Text Input Area
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -65,34 +77,31 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     ),
                     child: TextField(
                       controller: _controller,
+                      // Language ke mutabiq alignment
                       textAlign: selectedLanguage == 'English' ? TextAlign.left : TextAlign.right,
-                      // System Toolbar ko minimize karne ke liye properties
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      keyboardType: TextInputType.visiblePassword,
                       decoration: InputDecoration(
                         hintText: t['hint'],
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       ),
                     ),
                   ),
                 ),
-
-                // 3. Speaker (Mic) Button
                 IconButton(
-                  icon: const Icon(Icons.mic_none_outlined, color: Colors.grey),
-                  onPressed: () {}, // Voice Logic
+                  icon: const Icon(Icons.mic_none_outlined, color: AppConstants.secondaryGreen),
+                  onPressed: () {},
                 ),
-
-                // 4. Send Button
+                const SizedBox(width: 5),
                 CircleAvatar(
-                  backgroundColor: primaryGreen,
+                  backgroundColor: AppConstants.primaryGreen,
                   radius: 22,
                   child: IconButton(
                     icon: const Icon(Icons.send, color: Colors.white, size: 20),
                     onPressed: () {
-                      _controller.clear();
+                      if(_controller.text.isNotEmpty) {
+                        _controller.clear();
+                        // Yahan message send karne ki logic aayegi
+                      }
                     },
                   ),
                 ),
@@ -104,17 +113,26 @@ class _AiChatScreenState extends State<AiChatScreen> {
     );
   }
 
-  // Helper widget for Top Language Buttons
   Widget _buildLanguageButton(String lang) {
     bool isSelected = selectedLanguage == lang;
-    return TextButton(
-      onPressed: () => setState(() => selectedLanguage = lang),
-      child: Text(
-        lang,
-        style: TextStyle(
-          color: isSelected ? Colors.white : Colors.white60,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 12,
+    return GestureDetector(
+      onTap: () => setState(() => selectedLanguage = lang),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white24 : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Text(
+            lang,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.white70,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 11,
+            ),
+          ),
         ),
       ),
     );

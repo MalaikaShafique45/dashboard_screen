@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dashboard_screen/views/sign_in_screen.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -13,7 +14,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool isOfflineMode = false;
   bool isLocationEnabled = true;
   bool isPasswordSaved = true;
-  bool showActivityStatus = true; // New State
+  bool showActivityStatus = true;
   bool weatherAlerts = true;
 
   static const Color primaryGreen = Color(0xFF1B4332);
@@ -41,7 +42,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _settingsTile(Icons.language, "App Language", "ایپ کی زبان (English / Urdu)", textColor, () {
             _showLanguageDialog(context);
           }),
-
 
           _switchTile(Icons.cloud_off_outlined, "Offline Mode", "انٹرنیٹ کے بغیر استعمال کریں", isOfflineMode, textColor, (bool value) {
             setState(() => isOfflineMode = value);
@@ -78,8 +78,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // --- Section 4: Support ---
           _sectionHeader("Support & Legal", textColor),
 
-
-
           _settingsTile(Icons.security, "Privacy Policy", "رازداری کی پالیسی", textColor, () {
             _showPolicyDialog(context);
           }),
@@ -92,7 +90,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // --- Updated Language Dialog (Only English & Urdu) ---
+  // --- UPDATED: Privacy Policy Dialog with Instructions ---
+  void _showPolicyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Column(
+          children: [
+            Icon(Icons.verified_user_outlined, color: primaryGreen, size: 40),
+            SizedBox(height: 10),
+            Text("Privacy Policy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text("(رازداری کی پالیسی)", style: TextStyle(fontSize: 14, color: Colors.grey)),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _policyItem(
+                  "Data Security",
+                  "Your farm data and personal info are encrypted and safe.",
+                  "آپ کا ڈیٹا اور ذاتی معلومات اس ایپ میں مکمل طور پر محفوظ ہیں۔"
+              ),
+              _policyItem(
+                  "Location Privacy",
+                  "Location is only used for accurate weather and mandi updates.",
+                  "لوکیشن صرف آپ کو موسم اور منڈی کے ریٹ بتانے کے لیے استعمال ہوتی ہے۔"
+              ),
+              _policyItem(
+                  "No Data Sharing",
+                  "We never share your personal information with third parties.",
+                  "ہم آپ کی معلومات کسی تیسرے فریق کے ساتھ شیئر نہیں کرتے۔"
+              ),
+              const Divider(),
+              const Text(
+                "By using this app, you agree to protect the platform's integrity.",
+                style: TextStyle(fontSize: 10, color: Colors.grey, fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          Center(
+            child: TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("I Understand (سمجھ گیا)",
+                  style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper for Policy Items
+  Widget _policyItem(String title, String eng, String urdu) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryGreen)),
+          const SizedBox(height: 2),
+          Text(eng, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+          const SizedBox(height: 2),
+          Text(urdu, textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 11, color: Colors.black54, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+
+  // --- Other Helpers (Language, Logout, etc.) ---
   void _showLanguageDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -134,39 +205,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Text("کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟", style: TextStyle(fontWeight: FontWeight.w500)),
           ],
         ),
-        actionsAlignment: MainAxisAlignment.spaceEvenly,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // Dialog band karne ke liye
-            child: const Text("Cancel (کینسل)", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const SignInScreen()),
                     (route) => false,
               );
-              print("Logout button clicked and navigating to Sign In...");
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: const Text("Yes (جی ہاں)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Yes", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  // --- UI Helpers ---
-
   Widget _sectionHeader(String title, Color tColor) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(title, style: TextStyle(color: isDarkMode ? Colors.greenAccent : primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
+      child: Text(title, style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
     );
   }
 
@@ -204,22 +268,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         icon: const Icon(Icons.logout),
         onPressed: () => _showLogoutDialog(context),
         label: const Text("Logout (لاگ آؤٹ)", style: TextStyle(fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  void _showSnackBar(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
-  }
-
-  void _showPolicyDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text("Privacy Policy"),
-        content: const Text("محترم کسان! آپ کا ڈیٹا اس ایپ میں مکمل طور پر محفوظ ہے۔", textAlign: TextAlign.right),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))],
       ),
     );
   }

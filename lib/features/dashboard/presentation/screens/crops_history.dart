@@ -1,118 +1,105 @@
 import 'package:flutter/material.dart';
-class CropsHistoryScreen extends StatelessWidget {
-  const CropsHistoryScreen({super.key});
 
-  static const Color primaryGreen = Color(0xFF1B4332);
-  static const Color bgCream = Color(0xFFF5F3E5);
+class CropsHistory extends StatefulWidget {
+  const CropsHistory({super.key});
+
+  @override
+  State<CropsHistory> createState() => _CropsHistoryState();
+}
+
+class _CropsHistoryState extends State<CropsHistory> {
+  final Color primaryGreen = const Color(0xFF1B4332);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgCream,
+      backgroundColor: const Color(0xFFF9F3E5),
       appBar: AppBar(
-        title: const Text("Crops History",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.only(bottom: 25, left: 16, right: 16, top: 10),
-                decoration: const BoxDecoration(
-                  color: primaryGreen,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    const Text("(فصلوں کا ریکارڈ)", style: TextStyle(color: Colors.white70, fontSize: 14)),
-                    const SizedBox(height: 15),
-                    Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: const TextField(
-                        decoration: InputDecoration(
-                          hintText: "Search Crops...",
-                          prefixIcon: Icon(Icons.search, color: Colors.grey),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: <Widget>[
-                          _buildSummaryCard(Icons.grid_view, "5", "Total Fields"),
-                          _buildSummaryCard(Icons.calendar_month, "Rabi", "Season"),
-                          _buildSummaryCard(Icons.refresh, "2 days ago", "Updated"),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column( // Replaced ListView with Column to avoid Scroll physics warnings
-                  children: <Widget>[
-                    _buildCropCard("Wheat (گندم)", "Active", "12 Nov 2025", Colors.green),
-                    _buildCropCard("Cotton (کپاس)", "Harvested", "12 Nov 2025", Colors.red),
-                    _buildCropCard("Wheat (گندم)", "Harvested", "12 Nov 2025", Colors.red),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: const Column(
+          children: [
+            Text("Crops History", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text("(فصلوں کا ریکارڈ)", style: TextStyle(color: Colors.white70, fontSize: 12)),
+          ],
+        ),
+        centerTitle: true,
       ),
-    );
-  }
+      body: Column(
+        children: [
+          // --- Search Bar Section (Clean Header) ---
+          Container(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 25, top: 10),
+            decoration: BoxDecoration(
+              color: primaryGreen,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: "Search Crops / فصل تلاش کریں...",
+                prefixIcon: Icon(Icons.search, color: primaryGreen),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              ),
+            ),
+          ),
 
-  Widget _buildSummaryCard(IconData icon, String value, String label) {
-    return Container(
-      width: 100,
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-      child: Column(
-        children: <Widget>[
-          Icon(icon, color: primaryGreen, size: 22),
-          const SizedBox(height: 5),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          Text(label, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+          const SizedBox(height: 10),
+
+          // --- Simple Crops List Section ---
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildCropTile("Wheat (گندم)", "Harvested", "Date: 12 Nov 2025", Colors.green),
+                _buildCropTile("Cotton (کپاس)", "In Progress", "Date: 10 Aug 2025", Colors.orange),
+                _buildCropTile("Rice (چاول)", "Sold", "Date: 15 Sep 2025", Colors.blue),
+                _buildCropTile("Maize (مکئی)", "Growing", "Date: 05 Jan 2026", Colors.brown),
+                _buildCropTile("Sugarcane (گنا)", "Harvested", "Date: 20 Oct 2025", Colors.green),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCropCard(String name, String status, String date, Color statusColor) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5),
-      ),
+  // Helper for Crop Tiles
+  Widget _buildCropTile(String name, String status, String date, Color color) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 15),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Color(0xFFE8F5E9),
-          child: Icon(Icons.eco, color: primaryGreen, size: 20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        leading: CircleAvatar(
+          backgroundColor: color.withOpacity(0.1),
+          child: Icon(Icons.grass, color: color),
         ),
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text("Status: $status\nDate: $date"),
-        trailing: Icon(Icons.arrow_forward_ios, size: 14, color: statusColor),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(status, style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
+              Text(date, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            ],
+          ),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
       ),
     );
   }

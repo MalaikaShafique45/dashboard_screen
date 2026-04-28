@@ -1,6 +1,7 @@
+import 'package:dashboard_screen/views/create_account_screen.dart';
 import 'package:flutter/material.dart';
-import '../features/dashboard/presentation/screens/dashboard_screen.dart'; // Standard Relative Path
-import 'create_account_screen.dart';
+import 'package:dashboard_screen/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:dashboard_screen/features/admin/presentation/screens/admin_dashboard_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -10,13 +11,11 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  // Logic Variables
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String _selectedRole = "User";
 
-  // Custom Styles
   static const Color primaryGreen = Color(0xFF1B4332);
-  static const Color bgCream = Color(0xFFF9F3E5);
 
   @override
   void dispose() {
@@ -31,17 +30,14 @@ class _SignInScreenState extends State<SignInScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true, // Keyboard aany par screen adjust ho
       body: SingleChildScrollView(
-        //physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
+            // Banner Section
             Stack(
-              clipBehavior: Clip.none,
               children: [
-                // 1. Top Image Header (Lush fields_bg.jpg)
                 Container(
-                  height: screenHeight * 0.45,
+                  height: screenHeight * 0.40,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
@@ -54,10 +50,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                 ),
-
-                // 2. Translucent Overlay for Text Visibility
                 Container(
-                  height: screenHeight * 0.45,
+                  height: screenHeight * 0.40,
                   decoration: const BoxDecoration(
                     color: Colors.black45,
                     borderRadius: BorderRadius.only(
@@ -66,91 +60,104 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                 ),
-
-                // 3. Logo, Text & Language (Farmer's Portal)
                 Positioned(
-                  top: screenHeight * 0.15,
+                  top: screenHeight * 0.12,
                   left: 0,
                   right: 0,
                   child: Column(
                     children: const [
-                      Icon(Icons.eco, size: 70, color: Colors.white),
+                      Icon(Icons.eco, size: 60, color: Colors.white),
                       SizedBox(height: 10),
-                      // CHANGED: 'Welcome Back' to 'Farmer's Portal'
-                      Text("Farmer's Portal",
-                          style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-                      // CHANGED: Urdu Text
-                      Text("(کسانوں کا پورٹل)",
-                          style: TextStyle(color: Colors.white70, fontSize: 18)),
+                      Text("Farmer's Portal", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                      Text("(کسانوں کا پورٹل)", style: TextStyle(color: Colors.white70, fontSize: 16)),
                     ],
                   ),
                 ),
               ],
             ),
 
-            // 4. White Curved Container for Input Fields
-            Transform.translate(
-              offset: const Offset(0, -50), // Overlaps the bottom of the image
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 30),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Sign In", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Sign In", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 25),
 
-                    _buildTextField("Email Address", "ای میل (Email)", _emailController, Icons.email_outlined),
-                    const SizedBox(height: 20),
-                    _buildTextField("Password", "پاس ورڈ (Password)", _passwordController, Icons.lock_outline, isPassword: true),
+                  // Email & Password Fields
+                  _buildTextField("Email Address", "ای میل", _emailController, Icons.email_outlined),
+                  const SizedBox(height: 20),
+                  _buildTextField("Password", "پاس ورڈ", _passwordController, Icons.lock_outline, isPassword: true),
 
-                    const SizedBox(height: 35),
+                  const SizedBox(height: 30),
 
-                    // Sign In Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => DashboardScreen())
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryGreen,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          elevation: 3,
-                        ),
-                        child: const Text("Sign In",
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  // --- ROLE SELECTOR (Neeche move kar diya gaya hai) ---
+                  const Text("Login As:", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Radio(
+                        value: "User",
+                        groupValue: _selectedRole,
+                        activeColor: primaryGreen,
+                        onChanged: (val) => setState(() => _selectedRole = val.toString()),
                       ),
-                    ),
+                      const Text("User"),
+                      const SizedBox(width: 30),
+                      Radio(
+                        value: "Admin",
+                        groupValue: _selectedRole,
+                        activeColor: primaryGreen,
+                        onChanged: (val) => setState(() => _selectedRole = val.toString()),
+                      ),
+                      const Text("Admin"),
+                    ],
+                  ),
 
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
-                    // Registration Text
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account?"),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAccountScreen()));
-                          },
-                          child: const Text("Register",
-                              style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
-                        ),
-                      ],
+                  // Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_selectedRole == "Admin") {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+                          );
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const DashboardScreen()),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryGreen,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: Text("Sign In as $_selectedRole", style: const TextStyle(color: Colors.white, fontSize: 18)),
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Register Text (Ab iske upar selection hai)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Don't have an account?"),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAccountScreen()));
+                        },
+                        child: const Text("Register", style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -166,7 +173,7 @@ class _SignInScreenState extends State<SignInScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 14)),
             Text(urduLabel, style: const TextStyle(color: Colors.grey, fontSize: 12)),
           ],
         ),
@@ -179,7 +186,6 @@ class _SignInScreenState extends State<SignInScreen> {
             filled: true,
             fillColor: const Color(0xFFF5F7F9),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
           ),
         ),
       ],
