@@ -3,25 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../utility/app_constants.dart';
 
-// ─────────────────────────────────────────────
-// IMPORTANT: Change this to your PC's IP address
-// Find it by running: ipconfig  in PowerShell
-// Use the IPv4 address, e.g. 192.168.1.5
-// Do NOT use 127.0.0.1 — that won't work on phone
-const String DJANGO_BASE_URL = 'http://192.168.1.5:8000';
-// ─────────────────────────────────────────────
-
-class ChatMessage {
-  final String text;
-  final bool isUser;
-  final String language;
-
-  ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.language,
-  });
-}
+const String DJANGO_BASE_URL = 'http://192.168.1.9:8000';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -34,8 +16,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
   String selectedLanguage = 'اردو';
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<ChatMessage> _messages = [];
   bool _isLoading = false;
+
+  final List<Map<String, String>> _messages = [];
 
   final Map<String, Map<String, String>> translations = {
     'English': {
@@ -45,35 +28,59 @@ class _AiChatScreenState extends State<AiChatScreen> {
       'thinking': 'Thinking...',
     },
     'اردو': {
-      'welcome': 'السلام علیکم! فصل، موسم یا قیمتوں کے بارے میں پوچھیں۔',
+      'welcome': 'السلام علیکم! فصل، موسم یا مارکیٹ قیمتوں کے بارے میں پوچھیں۔',
       'hint': 'پیغام لکھیں...',
-      'error': 'کنیکشن نہیں ہو سکا۔ انٹرنیٹ چیک کریں۔',
+      'error': 'کنکشن نہیں ہوا۔ انٹرنیٹ چیک کریں۔',
       'thinking': 'سوچ رہا ہوں...',
     },
     'سنڌي': {
-      'welcome': 'اسلام عليڪم! فصل، موسم يا قيمتن بابت پڇو.',
+      'welcome': 'اسلام عليڪم! فصل، موسم يا مارڪيٽ قيمتن بابت پڇو.',
       'hint': 'پيغام لکو...',
       'error': 'ڪنيڪشن نه ٿيو. انٽرنيٽ چيڪ ڪريو.',
       'thinking': 'سوچي رهيو آهيان...',
     },
   };
 
-  @override
-  void initState() {
-    super.initState();
-    // Show welcome message on start
-    _addBotMessage(translations[selectedLanguage]!['welcome']!);
+  Future<void> _sendMessage() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _messages.add({'role': 'user', 'text': text});
+      _isLoading = true;
+    });
+    _controller.clear();
+    _scrollToBottom();
+
+    try {
+      final response = await http.post(
+        Uri.parse('$DJANGO_BASE_URL/api/chat/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'message': text}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        final botReply = data['response'] ?? translations[selectedLanguage]!['error']!;
+        setState(() {
+          _messages.add({'role': 'bot', 'text': botReply});
+          _isLoading = false;
+        });
+      } else {
+        _addErrorMessage();
+      }
+    } catch (e) {
+      _addErrorMessage();
+    }
+
+    _scrollToBottom();
   }
 
-  void _addBotMessage(String text) {
+  void _addErrorMessage() {
     setState(() {
-      _messages.add(ChatMessage(
-        text: text,
-        isUser: false,
-        language: selectedLanguage,
-      ));
+      _messages.add({'role': 'bot', 'text': translations[selectedLanguage]!['error']!});
+      _isLoading = false;
     });
-    _scrollToBottom();
   }
 
   void _scrollToBottom() {
@@ -88,64 +95,72 @@ class _AiChatScreenState extends State<AiChatScreen> {
     });
   }
 
-  Future<void> _sendMessage() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty || _isLoading) return;
+  Widget _buildBubble(Map<String, String> msg) {
+    final isUser = msg['role'] == 'user';
+    final isRTL = selectedLanguage != 'English';
 
-    // Add user message to chat
-    setState(() {
-      _messages.add(ChatMessage(text: text, isUser: true, language: selectedLanguage));
-      _isLoading = true;
-    });
-    _controller.clear();
-    _scrollToBottom();
-
-    // Call Django chatbot API
-    try {
-      final response = await http.post(
-        Uri.parse('$DJANGO_BASE_URL/api/chat/'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'message': text}),
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
-        final botReply = data['response'] ?? translations[selectedLanguage]!['error']!;
-        _addBotMessage(botReply);
-      } else {
-        _addBotMessage(translations[selectedLanguage]!['error']!);
-      }
-    } catch (e) {
-      _addBotMessage(translations[selectedLanguage]!['error']!);
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        decoration: BoxDecoration(
+          color: isUser ? AppConstants.primaryGreen : Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(isUser ? 16 : 4),
+            bottomRight: Radius.circular(isUser ? 4 : 16),
+          ),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
+        ),
+        child: Text(
+          msg['text']!,
+          textAlign: isRTL ? TextAlign.right : TextAlign.left,
+          textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+          style: TextStyle(color: isUser ? Colors.white : Colors.black87, fontSize: 14.5, height: 1.4),
+        ),
+      ),
+    );
   }
 
-  void _onLanguageChange(String lang) {
-    setState(() {
-      selectedLanguage = lang;
-      _messages.clear();
-    });
-    _addBotMessage(translations[lang]!['welcome']!);
+  Widget _buildThinkingIndicator() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 16, height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppConstants.primaryGreen),
+            ),
+            const SizedBox(width: 8),
+            Text(translations[selectedLanguage]!['thinking']!, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     var t = translations[selectedLanguage]!;
-    bool isRTL = selectedLanguage != 'English';
+    final isRTL = selectedLanguage != 'English';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F5),
       appBar: AppBar(
-        title: const Text(
-          "Agri Dost AI",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+        title: const Text("Agri Dost AI",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: AppConstants.primaryGreen,
         elevation: 2,
         actions: [
@@ -157,62 +172,49 @@ class _AiChatScreenState extends State<AiChatScreen> {
       ),
       body: Column(
         children: [
-          // ── Chat messages area ──────────────────────
           Expanded(
             child: _messages.isEmpty
                 ? Center(
-                    child: Text(
-                      t['welcome']!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w500,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.agriculture, size: 64, color: AppConstants.primaryGreen.withOpacity(0.4)),
+                          const SizedBox(height: 16),
+                          Text(t['welcome']!,
+                              textAlign: TextAlign.center,
+                              textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+                              style: const TextStyle(fontSize: 15, color: Colors.grey, fontWeight: FontWeight.w500)),
+                        ],
                       ),
                     ),
                   )
                 : ListView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     itemCount: _messages.length + (_isLoading ? 1 : 0),
                     itemBuilder: (context, index) {
-                      // Show typing indicator at end
-                      if (_isLoading && index == _messages.length) {
-                        return _buildTypingIndicator(t['thinking']!);
-                      }
-                      return _buildMessageBubble(_messages[index]);
+                      if (index == _messages.length) return _buildThinkingIndicator();
+                      return _buildBubble(_messages[index]);
                     },
                   ),
           ),
-
-          // ── Input area ──────────────────────────────
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             decoration: const BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, -2),
-                )
-              ],
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
             ),
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(
-                    Icons.camera_alt_outlined,
-                    color: AppConstants.secondaryGreen,
-                  ),
+                  icon: const Icon(Icons.camera_alt_outlined, color: AppConstants.secondaryGreen),
                   onPressed: () {},
                 ),
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0F2F5),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xFFF0F2F5), borderRadius: BorderRadius.circular(25)),
                     child: TextField(
                       controller: _controller,
                       textAlign: isRTL ? TextAlign.right : TextAlign.left,
@@ -220,20 +222,15 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
                         hintText: t['hint'],
+                        hintTextDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 10,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       ),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(
-                    Icons.mic_none_outlined,
-                    color: AppConstants.secondaryGreen,
-                  ),
+                  icon: const Icon(Icons.mic_none_outlined, color: AppConstants.secondaryGreen),
                   onPressed: () {},
                 ),
                 const SizedBox(width: 5),
@@ -241,16 +238,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                   backgroundColor: AppConstants.primaryGreen,
                   radius: 22,
                   child: IconButton(
-                    icon: _isLoading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Icon(Icons.send, color: Colors.white, size: 20),
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
                     onPressed: _isLoading ? null : _sendMessage,
                   ),
                 ),
@@ -262,122 +250,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
     );
   }
 
-  // ── Message bubble widget ───────────────────────────
-  Widget _buildMessageBubble(ChatMessage message) {
-    bool isRTL = message.language != 'English';
-    bool isUser = message.isUser;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Bot avatar
-          if (!isUser) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppConstants.primaryGreen,
-              child: const Icon(Icons.eco, color: Colors.white, size: 16),
-            ),
-            const SizedBox(width: 6),
-          ],
-
-          // Message bubble
-          Flexible(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.72,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: isUser
-                    ? AppConstants.primaryGreen
-                    : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isUser ? 18 : 4),
-                  bottomRight: Radius.circular(isUser ? 4 : 18),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  )
-                ],
-              ),
-              child: Text(
-                message.text,
-                textAlign: isRTL ? TextAlign.right : TextAlign.left,
-                textDirection:
-                    isRTL ? TextDirection.rtl : TextDirection.ltr,
-                style: TextStyle(
-                  color: isUser ? Colors.white : Colors.black87,
-                  fontSize: 14.5,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ),
-
-          // User avatar
-          if (isUser) ...[
-            const SizedBox(width: 6),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.grey.shade300,
-              child: const Icon(Icons.person, color: Colors.grey, size: 16),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  // ── Typing indicator ────────────────────────────────
-  Widget _buildTypingIndicator(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: AppConstants.primaryGreen,
-            child: const Icon(Icons.eco, color: Colors.white, size: 16),
-          ),
-          const SizedBox(width: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                const SizedBox(width: 8),
-                Text(text, style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Language button ─────────────────────────────────
   Widget _buildLanguageButton(String lang) {
     bool isSelected = selectedLanguage == lang;
     return GestureDetector(
-      onTap: () => _onLanguageChange(lang),
+      onTap: () => setState(() => selectedLanguage = lang),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -386,14 +262,12 @@ class _AiChatScreenState extends State<AiChatScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
-          child: Text(
-            lang,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white70,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 11,
-            ),
-          ),
+          child: Text(lang,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white70,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 11,
+              )),
         ),
       ),
     );
